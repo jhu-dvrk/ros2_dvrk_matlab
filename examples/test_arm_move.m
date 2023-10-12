@@ -1,8 +1,8 @@
 % call methods to make sure they exist and don't trigger syntax errors
 % this test program will make the arm move!
 function test_arm_move(arm_name)
-    ros_12 = crtk.ros_12('test_arm_move');
-    r = dvrk.arm(arm_name, ros_12);
+    ral = crtk.ral('test_arm_move');
+    r = dvrk.arm(arm_name, ral);
     disp('---- Enabling (waiting up to 30s)');
     if ~r.enable(30.0)
         error('Unable to enable arm');
@@ -14,7 +14,7 @@ function test_arm_move(arm_name)
 
     % general settings
     rate = 200; % aiming for 200 Hz
-    ros_rate = ros_12.rate(rate);
+    ros_rate = ral.rate(rate);
 
     % move_jp
     disp('---- Joint move');
@@ -94,6 +94,6 @@ function test_arm_move(arm_name)
     % don't forget to cleanup
     disp('---- Deleting arm object');
     delete(r);
-    disp('---- Deleting ros_12 object');
-    delete(ros_12);
+    disp('---- Deleting ral object');
+    delete(ral);
 end

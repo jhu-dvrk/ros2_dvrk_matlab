@@ -6,9 +6,9 @@ classdef mtm_gripper < dynamicprops
 
     methods
 
-        function self = mtm_gripper(name)
+    function self = mtm_gripper(name, ral)
             self.ros_namespace = name;
-            self.crtk_utils = crtk.utils(self, name);
+            self.crtk_utils = crtk.utils(self, name, ral);
             self.crtk_utils.add_measured_js();
         end
 

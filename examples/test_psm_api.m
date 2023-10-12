@@ -1,11 +1,7 @@
 % call methods to make sure they exist and don't trigger syntax errors
 function test_psm_api(arm_name)
-    try
-        rosnode list;
-    catch
-        rosinit;
-    end
-    r = dvrk.psm(arm_name);
+    ral = crtk.ral('test_psm_api');
+    r = dvrk.psm(arm_name, ral);
     disp('---- Enabling (waiting up to 30s)');
     if ~r.enable(30.0)
         error('Unable to enable arm');
@@ -35,4 +31,6 @@ function test_psm_api(arm_name)
     % don't forget to cleanup
     disp('---- Delete arm class');
     delete(r);
+    disp('---- Deleting ral object');
+    delete(ral);
 end

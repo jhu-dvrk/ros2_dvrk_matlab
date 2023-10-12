@@ -17,20 +17,20 @@ classdef mtm < dvrk.arm
 
     methods
 
-        function self = mtm(name)
-            self@dvrk.arm(name);
-            self.gripper = dvrk.mtm_gripper(strcat(name, '/gripper'));
+    function self = mtm(name, ral)
+      self@dvrk.arm(name, ral);
+            self.gripper = dvrk.mtm_gripper(strcat(name, '/gripper'), ral);
             % ----------- publishers
             topic = strcat(self.ros_namespace, '/lock_orientation');
-            self.lock_orientation_publisher = rospublisher(topic, ...
-                                                           rostype.geometry_msgs_Quaternion);
+            self.lock_orientation_publisher = self.ral.publisher(topic, ...
+                                                                 rostype.geometry_msgs_Quaternion);
             topic = strcat(self.ros_namespace, '/unlock_orientation');
-            self.unlock_orientation_publisher = rospublisher(topic, ...
-                                                             rostype.std_msgs_Empty);
+            self.unlock_orientation_publisher = self.ral.publisher(topic, ...
+                                                                   rostype.std_msgs_Empty);
 
             % one time creation of messages to prevent lookup and creation at each call
-            self.std_msgs_Empty = rosmessage(rostype.std_msgs_Empty);
-            self.geometry_msgs_Quaternion = rosmessage(rostype.geometry_msgs_Quaternion);
+            self.std_msgs_Empty = self.ral.message(rostype.std_msgs_Empty);
+            self.geometry_msgs_Quaternion = self.ral.message(rostype.geometry_msgs_Quaternion);
         end
 
         function delete(self)

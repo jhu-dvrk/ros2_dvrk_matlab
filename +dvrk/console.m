@@ -8,6 +8,7 @@ classdef console < handle
     % settings that are not supposed to change after constructor
     properties (SetAccess = immutable)
         ros_namespace % namespace for this arm, should contain head/tail / (default is '')
+        ral
     end
 
     % only this class methods can view/modify
@@ -24,42 +25,38 @@ classdef console < handle
 
     methods
 
-        function self = console(namespace)
-            % Create a console interface.  The namespace is
-            % optional, default is empty.  It is provide for
-            % configurations with multiple dVRK so one could have
-            % /dvrkA/ and /dvrkB/
-            if nargin == 0
-                namespace = '';
-            end
+        function self = console(namespace, ral)
+            % Create a console interface.  The namespace
+            % default is empty.
             self.ros_namespace = namespace;
+            self.ral = ral;
 
             % ----------- subscribers
             % teleop scale
             topic = strcat(self.ros_namespace, 'console/teleop/scale');
             self.teleop_scale_subscriber = ...
-                rossubscriber(topic, rostype.std_msgs_Float64);
+                self.ral.subscriber(topic, rostype.std_msgs_Float64);
 
             % ----------- publishers
             % power off
             topic = strcat(self.ros_namespace, 'console/power_off');
-            self.power_off_publisher = rospublisher(topic, rostype.std_msgs_Empty);
+            self.power_off_publisher = self.ral.publisher(topic, rostype.std_msgs_Empty);
 
             % power on
             topic = strcat(self.ros_namespace, 'console/power_on');
-            self.power_on_publisher = rospublisher(topic, rostype.std_msgs_Empty);
+            self.power_on_publisher = self.ral.publisher(topic, rostype.std_msgs_Empty);
 
             % home
             topic = strcat(self.ros_namespace, 'console/home');
-            self.home_publisher = rospublisher(topic, rostype.std_msgs_Empty);
+            self.home_publisher = self.ral.publisher(topic, rostype.std_msgs_Empty);
 
             % teleop enable
             topic = strcat(self.ros_namespace, 'console/teleop/enable');
-            self.teleop_enable_publisher = rospublisher(topic, rostype.std_msgs_Bool);
+            self.teleop_enable_publisher = self.ral.publisher(topic, rostype.std_msgs_Bool);
 
             % teleop set scale
             topic = strcat(self.ros_namespace, 'console/teleop/set_scale');
-            self.teleop_set_scale_publisher = rospublisher(topic, rostype.std_msgs_Float64);
+            self.teleop_set_scale_publisher = self.ral.publisher(topic, rostype.std_msgs_Float64);
         end
 
 
@@ -72,39 +69,40 @@ classdef console < handle
 
         function scale = teleop_get_scale(self)
            % Accessor used to retrieve the last teleop scale
-           scale = self.teleop_scale_subscriber.LatestMessage.Data;
+           scale = self.teleop_scale_subscriber.LatestMessage.data;
         end
 
         function power_off(self)
-            message = rosmessage(self.power_off_publisher);
+            message = self.ral.message(self.power_off_publisher);
             send(self.power_off_publisher, message);
         end
 
         function power_on(self)
-            message = rosmessage(self.power_on_publisher);
+            message = self.ral.message(self.power_on_publisher);
             send(self.power_on_publisher, message);
         end
 
         function home(self)
-            message = rosmessage(self.home_publisher);
+            message = self.ral.message(self.home_publisher);
             send(self.home_publisher, message);
         end
 
         function teleop_start(self)
-            message = rosmessage(self.teleop_enable_publisher);
-            message.Data = true;
+            message = self.ral.message(self.teleop_enable_publisher);
+            message.data = true;
             send(self.teleop_enable_publisher, message);
         end
 
         function teleop_stop(self)
-            message = rosmessage(self.teleop_enable_publisher);
-            message.Data = false;
+            message = self.ral.message(self.teleop_enable_publisher);
+            message.data = false;
             send(self.teleop_enable_publisher, message);
         end
 
         function teleop_set_scale(self, scale)
-            message = rosmessage(self.teleop_set_scale_publisher);
-            message.Data = scale;
+            message = self.ral.message(self.teleop_set_scale_publisher);
+            message.data = scale;
+            message
             send(self.teleop_set_scale_publisher, message);
         end
 

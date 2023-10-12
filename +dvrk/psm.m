@@ -15,17 +15,17 @@ classdef psm < dvrk.arm
 
     methods
 
-        function self = psm(name)
-            self@dvrk.arm(name);
-            self.jaw = dvrk.psm_jaw(strcat(name, '/jaw'), self);
+        function self = psm(name, ral)
+            self@dvrk.arm(name, ral);
+            self.jaw = dvrk.psm_jaw(strcat(name, '/jaw'), self, ral);
             % ----------- publishers
             topic = strcat(self.ros_namespace, '/set_tool_present');
-            self.set_tool_present_publisher = rospublisher(topic, rostype.std_msgs_Bool);
+            self.set_tool_present_publisher = self.ral.publisher(topic, rostype.std_msgs_Bool);
             topic = strcat(self.ros_namespace, '/trajectory_j/set_ratio');
-            self.trajectory_j_set_ratio_publisher = rospublisher(topic, rostype.std_msgs_Float64);
+            self.trajectory_j_set_ratio_publisher = self.ral.publisher(topic, rostype.std_msgs_Float64);
             % ----------- subscribers
             topic = strcat(self.ros_namespace, '/trajectory_j/ratio');
-            self.trajectory_j_ratio_subscriber = rossubscriber(topic, rostype.std_msgs_Float64);
+            self.trajectory_j_ratio_subscriber = self.ral.subscriber(topic, rostype.std_msgs_Float64);
         end
 
         function delete(self)
@@ -40,23 +40,23 @@ classdef psm < dvrk.arm
         end
 
         function set_tool_present(self, tp)
-            tp_message = rosmessage(self.set_tool_present_publisher);
-            tp_message.Data = tp;
+            tp_message = self.ral.message(self.set_tool_present_publisher);
+            tp_message.data = tp;
             % send message
             send(self.tool_present_publisher, ...
                  tp_message);
         end
 
         function trajectory_j_set_ratio(self, ratio)
-            ratio_message = rosmessage(self.trajectory_j_set_ratio_publisher);
-            ratio_message.Data = ratio;
+            ratio_message = self.ral.message(self.trajectory_j_set_ratio_publisher);
+            ratio_message.data = ratio;
             % send message
             send(self.trajectory_j_set_ratio_publisher, ...
                  ratio_message);
         end
 
         function ratio = trajectory_j_ratio(self)
-            ratio = self.trajectory_j_ratio_subscriber.LatestMessage.Data;
+            ratio = self.trajectory_j_ratio_subscriber.LatestMessage.data;
         end
 
     end

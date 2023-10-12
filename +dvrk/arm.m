@@ -1,4 +1,4 @@
-classdef arm < dynamicprops & handle
+classdef arm < dynamicprops
     % Class used to interface with ROS dVRK arm topics and convert to useful
     % Matlab commands and properties.  To create a robot interface:
     %   r = arm('PSM1');
@@ -12,7 +12,7 @@ classdef arm < dynamicprops & handle
     % values set by this class, can be read by others
     properties (Access = protected)
         crtk_utils;
-        ros_12;
+        ral;
         ros_namespace;
         % publishers
         wrench_body_orientation_absolute_publisher;
@@ -34,13 +34,13 @@ classdef arm < dynamicprops & handle
             name = self.ros_namespace;
         end
 
-        function self = arm(name, ros_12)
+        function self = arm(name, ral)
             self.ros_namespace = name;
-            self.crtk_utils = crtk.utils(self, name, ros_12);
-            self.ros_12 = ros_12;
-            self.body = dvrk.arm_cf(strcat(name, '/body'), ros_12);
-            self.spatial = dvrk.arm_cf(strcat(name, '/spatial'), ros_12);
-            self.local = dvrk.arm_local(strcat(name, '/local'), ros_12);
+            self.crtk_utils = crtk.utils(self, name, ral);
+            self.ral = ral;
+            self.body = dvrk.arm_cf(strcat(name, '/body'), ral);
+            self.spatial = dvrk.arm_cf(strcat(name, '/spatial'), ral);
+            self.local = dvrk.arm_local(strcat(name, '/local'), ral);
             % operating state
             self.crtk_utils.add_operating_state();
             % joint space
@@ -63,18 +63,17 @@ classdef arm < dynamicprops & handle
             % custom publishers
             topic = strcat(self.ros_namespace, '/body_set_cf_orientation_absolute');
             self.wrench_body_orientation_absolute_publisher = ...
-                self.ros_12.publisher(topic, rostype.std_msgs_Bool);
+                self.ral.publisher(topic, rostype.std_msgs_Bool);
             topic = strcat(self.ros_namespace, '/use_gravity_compensation');
             self.gravity_compensation_publisher = ...
-                self.ros_12.publisher(topic, rostype.std_msgs_Bool);
+                self.ral.publisher(topic, rostype.std_msgs_Bool);
             % one time creation of messages to prevent lookup and creation at each call
-            self.std_msgs_Bool = self.ros_12.message(rostype.std_msgs_Bool);
+            self.std_msgs_Bool = self.ral.message(rostype.std_msgs_Bool);
 
             self.cleanup = onCleanup(@()delete(self));
         end
 
         function delete(self)
-            disp('deleting arm');
             delete(self.crtk_utils);
             delete(self.body);
             delete(self.spatial);
@@ -82,7 +81,7 @@ classdef arm < dynamicprops & handle
         end
 
         function result = body_set_cf_orientation_absolute(self, absolute)
-            self.std_msgs_Bool.Data = absolute;
+            self.std_msgs_Bool.data = absolute;
             % send message
             send(self.wrench_body_orientation_absolute_publisher, ...
                  self.std_msgs_Bool);
@@ -90,7 +89,7 @@ classdef arm < dynamicprops & handle
         end
 
         function result = use_gravity_compensation(self, gravity)
-            self.std_msgs_Bool.Data = gravity;
+            self.std_msgs_Bool.data = gravity;
             % send message
             send(self.gravity_compensation_publisher, ...
                  self.std_msgs_Bool);

@@ -6,9 +6,9 @@ classdef psm_jaw < dynamicprops
 
     methods
 
-        function self = psm_jaw(name, operating_state_instance)
+        function self = psm_jaw(name, operating_state_instance, ral)
             self.ros_namespace = name;
-            self.crtk_utils = crtk.utils(self, name, operating_state_instance);
+            self.crtk_utils = crtk.utils(self, name, ral, operating_state_instance);
             self.crtk_utils.add_measured_js();
             self.crtk_utils.add_setpoint_js();
             self.crtk_utils.add_servo_jp();
