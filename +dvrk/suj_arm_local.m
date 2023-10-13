@@ -6,9 +6,9 @@ classdef suj_arm_local < dynamicprops
 
     methods
 
-        function self = suj_arm_local(ros_namespace)
+        function self = suj_arm_local(ros_namespace, ral)
             self.ros_namespace = ros_namespace;
-            self.crtk_utils = crtk.utils(self, ros_namespace);
+            self.crtk_utils = crtk.utils(self, ros_namespace, ral);
             self.crtk_utils.add_measured_cp();
         end
 

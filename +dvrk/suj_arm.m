@@ -10,15 +10,15 @@ classdef suj_arm < dynamicprops
 
     methods
 
-        function self = suj_arm(name)
+        function self = suj_arm(name, ral)
             self.ros_namespace = name;
-            self.crtk_utils = crtk.utils(self, name);
+            self.crtk_utils = crtk.utils(self, name, ral);
             self.crtk_utils.add_operating_state();
             self.crtk_utils.add_measured_js();
             self.crtk_utils.add_measured_cp();
             self.crtk_utils.add_servo_jp();
             % local
-            self.local = dvrk.suj_arm_local(strcat(name, '/local'));
+            self.local = dvrk.suj_arm_local(strcat(name, '/local'), ral);
         end
 
         function delete(self)
