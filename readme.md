@@ -1,6 +1,8 @@
 Matlab interface for the dVRK ROS topics
 ========================================
 
+:warning: The ROS 2 dVRK client library is not fully ported.  We ran out of time for the dVRK release 2.2.0.  It should work just enough for the MTM gravity compensation calibration.
+
 Interface class used to subscribe and publish to the dVRK (da Vinci Research Kit) ROS topics in Matlab (client side).  To use this class, one must first start the cisst/SAW based C++ controller with the ROS interfaces (server).
 
 See in `dvrk-ros` (on github: https://github.com/jhu-dvrk/dvrk-ros), package `dvrk_robot`, application `dvrk_console_json`.  To compile and
